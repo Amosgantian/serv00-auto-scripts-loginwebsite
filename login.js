@@ -17,7 +17,11 @@ async function delayTime(ms) {
   for (const account of accounts) {
     const { username, password, panelnum } = account;
 
-    const browser = await puppeteer.launch({ headless: false });
+    // 启动 Puppeteer 并添加 --no-sandbox 参数
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'] // 添加参数解决沙箱问题
+    });
     const page = await browser.newPage();
 
     let url = `https://panel${panelnum}.serv00.com/login/?next=/`;
@@ -56,7 +60,7 @@ async function delayTime(ms) {
 
       if (isLoggedIn) {
         // 获取当前的UTC时间和北京时间
-        const nowUtc = formatToISO(new Date());// UTC时间
+        const nowUtc = formatToISO(new Date()); // UTC时间
         const nowBeijing = formatToISO(new Date(new Date().getTime() + 8 * 60 * 60 * 1000)); // 北京时间东8区，用算术来搞
         console.log(`账号 ${username} 于北京时间 ${nowBeijing}（UTC时间 ${nowUtc}）登录成功！`);
       } else {
